@@ -2,573 +2,378 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Thumb Battle Royale: Unleashed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystic Duel - Login & Lobby</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --p1-color: #00d2d3; /* Cyan */
-            --p2-color: #ff6b6b; /* Red */
-            --bg-dark: #1e272e;
-            --accent: #feca57;
+            --bg-color: #0f0c29;
+            --accent-color: #ffd700; /* Emas */
+            --primary-color: #7b2cbf; /* Ungu RPG */
+            --secondary-color: #302b63;
+            --text-color: #e0e0e0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --border-glow: 0 0 10px rgba(123, 44, 191, 0.5);
         }
-        
-        /* --- GLOBAL & ANTI-COPY --- */
+
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            -webkit-user-select: none; /* Chrome/Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* IE10+ */
-            user-select: none; /* Standard */
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Kecuali Input boleh diketik/copy */
-        input {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
         }
 
         body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
-            background-color: var(--bg-dark);
-            color: white;
-            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #24243e, #302b63, #0f0c29);
+            color: var(--text-color);
             height: 100vh;
             overflow: hidden;
             display: flex;
-            flex-direction: column;
-        }
-
-        /* --- SCREENS --- */
-        .screen {
-            display: none;
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0; left: 0;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            z-index: 10;
-            background: radial-gradient(circle at center, #2f3640 0%, #1e272e 100%);
-            transition: background 0.2s;
-        }
-        .screen.active { display: flex; }
-
-        /* --- UI ELEMENTS --- */
-        .logo { 
-            font-size: 40px; font-weight: 900; color: var(--accent); 
-            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; text-align: center;
-            text-shadow: 0 0 20px rgba(254, 202, 87, 0.5);
         }
 
-        input {
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 15px;
-            font-size: 18px;
-            border-radius: 10px;
-            width: 80%;
+        /* --- UTILS --- */
+        .hidden { display: none !important; }
+        .rpg-font { font-family: 'Cinzel', serif; }
+        .btn {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* --- LOGIN SECTION --- */
+        #login-section {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
             text-align: center;
-            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .game-logo {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
             outline: none;
         }
-        input:focus { border-color: var(--p1-color); background: rgba(0,0,0,0.3); }
 
-        .btn-main {
-            background: linear-gradient(45deg, #feca57, #ff9f43);
-            color: #2d3436;
-            width: 80%;
-            padding: 20px;
-            font-size: 20px;
-            font-weight: 900;
+        .input-field:focus {
+            box-shadow: var(--border-glow);
+        }
+
+        .btn-enter {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, var(--primary-color), #9d4edd);
             border: none;
-            border-radius: 15px;
-            text-transform: uppercase;
-            box-shadow: 0 6px 0 #e67e22, 0 10px 20px rgba(0,0,0,0.4);
-            cursor: pointer;
-            transition: transform 0.1s, filter 0.1s;
-        }
-        .btn-main:active { transform: translateY(6px); box-shadow: 0 0 0 #e67e22; }
-        
-        /* --- LOBBY --- */
-        .lobby-header { width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); }
-        .player-info h2 { margin: 0; font-size: 24px; text-shadow: 0 2px 5px black; }
-        .rank { font-size: 12px; background: #0984e3; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        
-        .lobby-char { flex: 1; display: flex; justify-content: center; align-items: flex-end; width: 100%; position: relative; }
-        .lobby-thumb { width: 120px; height: 240px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* --- GAME ARENA & FX --- */
-        #screen-game { 
-            background: radial-gradient(#4b6584, #2c3e50); 
-            overflow: hidden; /* Penting buat shake effect */
-        }
-        
-        /* Shake Class for Body/Container */
-        .shake-screen { animation: shakeHard 0.3s; }
-        .flash-red { animation: redFlash 0.2s; }
-        
-        @keyframes shakeHard {
-            0% { transform: translate(0, 0) rotate(0); }
-            20% { transform: translate(-10px, 0) rotate(-5deg); }
-            40% { transform: translate(10px, 0) rotate(3deg); }
-            60% { transform: translate(-10px, 0) rotate(-3deg); }
-            80% { transform: translate(10px, 0) rotate(2deg); }
-            100% { transform: translate(0, 0) rotate(0); }
-        }
-        @keyframes redFlash {
-            0%, 100% { box-shadow: inset 0 0 0 0 transparent; }
-            50% { box-shadow: inset 0 0 100px 50px rgba(255, 0, 0, 0.5); }
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 1rem;
         }
 
-        .hud { width: 100%; padding: 15px; display: flex; justify-content: space-between; position: absolute; top: 0; z-index: 20; }
-        
-        .bar-wrap { width: 100%; height: 15px; background: rgba(0,0,0,0.6); border-radius: 8px; overflow: hidden; margin-top: 5px; border: 1px solid rgba(255,255,255,0.1); }
-        .hp-bar { height: 100%; transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .stamina-container { width: 100%; height: 6px; background: rgba(0,0,0,0.8); margin-top: 5px; border-radius: 3px; overflow: hidden; }
-        .stamina-bar { height: 100%; background: #feca57; width: 100%; transition: width 0.1s linear; } /* Linear biar smooth */
-
-        .arena { 
-            flex: 1; position: relative; width: 100%; perspective: 800px; 
-            display: flex; justify-content: center; align-items: center; 
-            transition: transform 0.2s; /* Untuk zoom effect */
+        .btn-enter:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px var(--primary-color);
         }
-        
-        /* THUMB ASSETS */
-        .thumb-wrapper { position: absolute; bottom: 10%; width: 100px; height: 200px; transition: transform 0.08s; }
-        .thumb-body {
-            width: 100%; height: 100%;
-            background: linear-gradient(to right, #eacdad, #d4a585); /* Skin tone */
-            border-radius: 50px 50px 0 0;
-            box-shadow: inset -15px 0 20px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.5);
+
+        /* --- LOBBY SECTION --- */
+        #lobby-section {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             position: relative;
-            border: 2px solid rgba(0,0,0,0.2);
         }
-        .thumb-body::after { /* Kuku */
-            content: ''; position: absolute; top: 20px; left: 20px; width: 60px; height: 70px;
-            background: rgba(255,255,255,0.5); border-radius: 25px;
-            box-shadow: 0 0 5px rgba(255,255,255,0.8);
-        }
-        .wrist { position: absolute; bottom: 0; width: 100%; height: 35px; box-shadow: 0 0 15px currentColor; }
 
-        #thumb-p1 { left: 25%; transform-origin: bottom center; }
-        #thumb-p2 { right: 25%; transform-origin: bottom center; transform: scaleX(-1); }
-
-        /* MOVEMENT CLASSES */
-        .zoom-in { transform: scale(1.05); } /* Efek kamera pas nyerang */
-        
-        .atk { transform: rotate(50deg) translate(30px, 30px); filter: brightness(1.1); }
-        .dodge { transform: translateX(-50px) rotate(-20deg) !important; opacity: 0.6; filter: grayscale(0.5); }
-        .hit-anim { animation: hitWiggle 0.2s infinite; filter: brightness(3) sepia(1) saturate(5) hue-rotate(-50deg); } /* Efek kepukul */
-
-        @keyframes hitWiggle { 0% { transform: translateX(0); } 25% { transform: translateX(10px); } 75% { transform: translateX(-10px); } }
-
-        /* CONTROLS */
-        .controls { 
-            height: 140px; width: 100%; display: flex; padding: 15px; gap: 15px; 
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.1);
+        /* Header Lobby */
+        .lobby-header {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
         }
-        .btn-ctrl { 
-            flex: 1; border-radius: 20px; border: none; font-weight: 900; font-size: 24px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.3); transition: all 0.05s; position: relative; overflow: hidden;
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        #btn-dodge { background: #b2bec3; color: #2d3436; }
-        #btn-attack { background: #ff7675; color: white; font-size: 32px; }
-        
-        .btn-ctrl:active { transform: translateY(8px); box-shadow: none; }
-        .btn-ctrl.disabled { opacity: 0.4; filter: grayscale(1); pointer-events: none; transform: translateY(8px); box-shadow: none; }
-        
-        /* FX TEXT */
-        .fx-text {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 60px; font-weight: 900; color: #feca57; 
-            text-shadow: 0 0 30px orange, 4px 4px 0px #d35400;
-            display: none; z-index: 100; pointer-events: none;
-            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            border: 2px solid var(--accent-color);
         }
-        @keyframes popIn { 0% { transform: translate(-50%, -50%) scale(0); } 100% { transform: translate(-50%, -50%) scale(1); } }
+
+        .gold-badge {
+            background: rgba(0,0,0,0.4);
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        /* Match Button Area */
+        .lobby-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .match-btn-container {
+            position: relative;
+        }
+
+        .btn-match {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #5a189a, #240046);
+            border: 4px solid var(--accent-color);
+            color: white;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            font-family: 'Cinzel', serif;
+            box-shadow: 0 0 30px var(--primary-color);
+            animation: pulse 2s infinite;
+            z-index: 2;
+            position: relative;
+        }
+
+        .btn-match:hover {
+            transform: scale(1.1);
+            background: radial-gradient(circle, #7b2cbf, #3c096c);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(123, 44, 191, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(123, 44, 191, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(123, 44, 191, 0); }
+        }
+
+        /* Navigation Bottom */
+        .bottom-nav {
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-item {
+            text-align: center;
+            opacity: 0.5;
+            cursor: not-allowed;
+            position: relative;
+        }
+
+        .nav-item.active {
+            opacity: 1;
+            color: var(--accent-color);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .tooltip {
+            font-size: 0.7rem;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            display: block;
+        }
+
+        /* Matchmaking Overlay */
+        #matchmaking-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
         
         .loader {
-            width: 50px; height: 50px; border: 5px solid #fff; border-bottom-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     </style>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <div id="screen-login" class="screen active">
-        <div class="logo">THUMB WAR<br><span style="font-size: 20px; color: white;">ROYALE</span></div>
-        <input type="text" id="username" placeholder="Nickname Bebas" autocomplete="off">
-        <button class="btn-main" onclick="goToLobby()">ENTER ARENA</button>
+    <div id="login-section">
+        <h1 class="game-logo rpg-font">MYSTIC DUEL</h1>
+        <form id="login-form">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="username" class="input-field" placeholder="Ex: ShadowHunter" required autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>Password (Anonymous)</label>
+                <input type="password" id="password" class="input-field" placeholder="******" value="123456">
+            </div>
+            <button type="submit" class="btn btn-enter">MASUK ARENA</button>
+        </form>
     </div>
 
-    <div id="screen-lobby" class="screen">
+    <div id="lobby-section" class="hidden">
         <div class="lobby-header">
             <div class="player-info">
-                <span class="rank">UNRANKED</span>
-                <h2 id="lobby-name">Player</h2>
-            </div>
-            <div>🏆 0</div>
-        </div>
-        <div class="lobby-char">
-            <div class="thumb-wrapper lobby-thumb" style="bottom: 20%;">
-                <div class="thumb-body">
-                    <div class="wrist" style="background: var(--p1-color);"></div>
+                <div class="avatar rpg-font" id="display-avatar">S</div>
+                <div>
+                    <h3 class="rpg-font" id="display-username">Player</h3>
+                    <small style="color: #aaa;">Level 1 Novice</small>
                 </div>
             </div>
+            <div class="gold-badge">
+                <span>100 Gold</span>
+            </div>
         </div>
-        <div style="width: 100%; padding: 30px; text-align: center;">
-            <button class="btn-main" onclick="startMatch()">FIND MATCH</button>
+
+        <div class="lobby-main">
+            <div class="match-btn-container">
+                <button id="btn-match" class="btn btn-match">
+                    BATTLE<br><span style="font-size: 0.8rem; opacity: 0.8">Start Match</span>
+                </button>
+            </div>
+            <p style="margin-top: 20px; color: #888;">Online Players: 1,204</p>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="nav-item">
+                <span class="tooltip">Segera Hadir</span>
+                <span class="nav-icon">🎴</span>
+                <span>Deck</span>
+            </div>
+            <div class="nav-item active">
+                <span class="nav-icon">⚔️</span>
+                <span>Lobby</span>
+            </div>
+            <div class="nav-item">
+                <span class="tooltip">Segera Hadir</span>
+                <span class="nav-icon">🛒</span>
+                <span>Shop</span>
+            </div>
+            <div class="nav-item">
+                <span class="tooltip">Segera Hadir</span>
+                <span class="nav-icon">🏆</span>
+                <span>Rank</span>
+            </div>
         </div>
     </div>
 
-    <div id="screen-search" class="screen" style="background: rgba(0,0,0,0.9);">
+    <div id="matchmaking-overlay" class="hidden">
         <div class="loader"></div>
-        <h2>SEARCHING...</h2>
-        <button style="margin-top: 20px; background: transparent; border: 1px solid #aaa; color: #aaa; padding: 10px 30px; border-radius: 20px;" onclick="cancelSearch()">CANCEL</button>
-    </div>
-
-    <div id="screen-game" class="screen">
-        <div id="fx-text" class="fx-text">CLASH!</div>
-        
-        <div class="hud">
-            <div style="width: 45%;">
-                <div style="display:flex; justify-content:space-between;">
-                    <b id="hud-p1-name">Me</b>
-                </div>
-                <div class="bar-wrap"><div class="hp-bar" id="hp-p1" style="background: var(--p1-color); width: 100%;"></div></div>
-                <div class="stamina-container"><div class="stamina-bar" id="stamina-p1"></div></div>
-            </div>
-            <div style="width: 45%; text-align: right;">
-                <b id="hud-p2-name">Enemy</b>
-                <div class="bar-wrap"><div class="hp-bar" id="hp-p2" style="background: var(--p2-color); width: 100%;"></div></div>
-            </div>
-        </div>
-
-        <div class="arena" id="arena-box">
-            <div class="thumb-wrapper" id="thumb-p1">
-                <div class="thumb-body"><div class="wrist" style="background: var(--p1-color);"></div></div>
-            </div>
-            <div class="thumb-wrapper" id="thumb-p2">
-                <div class="thumb-body"><div class="wrist" style="background: var(--p2-color);"></div></div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <button class="btn-ctrl" id="btn-dodge" 
-                onmousedown="userInput('dodge', true)" onmouseup="userInput('dodge', false)"
-                ontouchstart="userInput('dodge', true)" ontouchend="userInput('dodge', false)">
-                🛡️ DODGE
-            </button>
-            <button class="btn-ctrl" id="btn-attack" 
-                onmousedown="userInput('attack', true)" onmouseup="userInput('attack', false)"
-                ontouchstart="userInput('attack', true)" ontouchend="userInput('attack', false)">
-                ⚔️ ATTACK
-            </button>
-        </div>
-    </div>
-
-    <div id="screen-result" class="screen" style="background: rgba(0,0,0,0.95);">
-        <h1 id="res-title" style="font-size: 50px;">-</h1>
-        <button class="btn-main" onclick="goToLobby()">LOBBY</button>
+        <h2 class="rpg-font">MENCARI LAWAN...</h2>
+        <p id="match-status" style="margin-top: 10px; color: #aaa;">Menghubungkan ke server...</p>
     </div>
 
     <script>
-        // --- SETUP FIREBASE ---
-        const fbConfig = {
-            apiKey: "AIzaSyCuEQQU_K8VFMrK7iu0tCvB3ujb_d75w-Y",
-            databaseURL: "https://missionimposibble-4e6a1-default-rtdb.firebaseio.com",
-            projectId: "missionimposibble-4e6a1",
-            appId: "1:139983716532:android:478a8c5c61b81cf1a2d7e1"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(fbConfig);
-        const db = firebase.database();
+        // --- VARIABLES ---
+        const loginSection = document.getElementById('login-section');
+        const lobbySection = document.getElementById('lobby-section');
+        const loginForm = document.getElementById('login-form');
+        const matchBtn = document.getElementById('btn-match');
+        const matchmakingOverlay = document.getElementById('matchmaking-overlay');
+        const matchStatus = document.getElementById('match-status');
 
-        // --- VARS ---
-        let myName = "Player";
-        let myId = 'u_' + Date.now();
-        let gameId = null;
-        let role = null;
-        let lobbyRef = null;
-        let gameRef = null;
-        
-        // Game Logic Vars
-        let myHP = 100, enemyHP = 100;
-        let myStamina = 100;
-        let myState = 'idle', enemyState = 'idle';
-        let isDead = false;
-        let ticker = null;
-        let lastEnemyHP = 100; // Untuk deteksi hit enemy
-
-        // --- NAVIGATION ---
-        function show(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function goToLobby() {
-            const nameInput = document.getElementById('username').value;
-            if(nameInput) myName = nameInput;
-            document.getElementById('lobby-name').innerText = myName;
+        // --- LOGIN LOGIC ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            // Reset vars
-            if(gameRef) gameRef.off();
-            clearInterval(ticker);
-            show('screen-lobby');
-        }
-
-        // --- MATCHMAKING ---
-        function startMatch() {
-            show('screen-search');
-            lobbyRef = db.ref('lobby_v4'); // Versi 4 bersih
+            const username = document.getElementById('username').value;
             
-            lobbyRef.transaction((curr) => {
-                if(curr === null) return { host: myId, name: myName, status: 'wait' };
-                return; // Abort
-            }, (err, committed, snap) => {
-                if(err) return alert("Error Net");
+            if(username) {
+                // Simpan username ke localStorage agar bisa dipakai di battle.html
+                localStorage.setItem('rpg_username', username);
                 
-                if(committed) { // Jadi HOST
-                    role = 'host';
-                    lobbyRef.on('child_added', (s) => {
-                        if(s.key === 'join') {
-                            const eData = s.val();
-                            initGame(myId + '_' + eData.id, eData.name);
-                            lobbyRef.off(); lobbyRef.remove();
-                        }
-                    });
-                    lobbyRef.onDisconnect().remove();
-                } else { // Jadi JOINER
-                    const d = snap.val();
-                    if(d && d.status === 'wait') {
-                        role = 'join';
-                        lobbyRef.update({ join: { id: myId, name: myName }, status: 'ready' })
-                        .then(() => initGame(d.host + '_' + myId, d.name));
-                    } else {
-                        setTimeout(startMatch, 1000); // Retry
-                    }
-                }
-            });
-        }
+                // Update tampilan Lobby
+                document.getElementById('display-username').innerText = username;
+                document.getElementById('display-avatar').innerText = username.charAt(0).toUpperCase();
 
-        function cancelSearch() {
-            if(lobbyRef) {
-                lobbyRef.off();
-                if(role === 'host') lobbyRef.remove();
+                // Transisi Layar
+                loginSection.style.display = 'none';
+                lobbySection.classList.remove('hidden');
             }
-            goToLobby();
-        }
+        });
 
-        // --- GAMEPLAY CORE ---
-        function initGame(gid, eName) {
-            gameId = gid;
-            gameRef = db.ref('games_v4/' + gameId);
-            
-            // Setup UI
-            document.getElementById('hud-p1-name').innerText = myName;
-            document.getElementById('hud-p2-name').innerText = eName;
-            show('screen-game');
-            
-            // Reset States
-            myHP = 100; enemyHP = 100; myStamina = 100; lastEnemyHP = 100;
-            isDead = false;
-            
-            if(role === 'host') {
-                gameRef.set({
-                    hHP: 100, jHP: 100,
-                    hState: 'idle', jState: 'idle'
-                });
-            }
+        // --- MATCHMAKING LOGIC ---
+        matchBtn.addEventListener('click', () => {
+            // Tampilkan overlay loading
+            matchmakingOverlay.classList.remove('hidden');
 
-            // Start Loops
-            listenDB();
-            startLoop();
-        }
+            // Simulasi proses mencari lawan (3 detik)
+            const steps = ["Mencari lawan sepadan...", "Menyiapkan arena...", "Lawan Ditemukan!"];
+            let stepIndex = 0;
 
-        function listenDB() {
-            gameRef.on('value', (s) => {
-                const d = s.val();
-                if(!d) return;
-
-                // Sync HP & Enemy State
-                let newMyHP, newEnemyHP;
-                
-                if(role === 'host') {
-                    newMyHP = d.hHP;
-                    newEnemyHP = d.jHP;
-                    enemyState = d.jState;
+            const interval = setInterval(() => {
+                if (stepIndex < steps.length) {
+                    matchStatus.innerText = steps[stepIndex];
+                    stepIndex++;
                 } else {
-                    newMyHP = d.jHP;
-                    newEnemyHP = d.hHP;
-                    enemyState = d.hState;
+                    clearInterval(interval);
+                    // Redirect ke halaman Battle
+                    window.location.href = 'battle.html';
                 }
-
-                // FX: Kena Damage (Screen Flash Merah)
-                if(newMyHP < myHP) {
-                    triggerShake(true); // Shake kencang
-                }
-                
-                // FX: Pukul Musuh (Musuh kedap kedip)
-                if(newEnemyHP < lastEnemyHP) {
-                     // Efek visual musuh kena hit handled di render
-                }
-
-                myHP = newMyHP;
-                enemyHP = newEnemyHP;
-                lastEnemyHP = enemyHP;
-
-                // Cek Mati
-                if(!isDead && (myHP <= 0 || enemyHP <= 0)) {
-                    isDead = true;
-                    setTimeout(endGame, 500);
-                }
-            });
-            gameRef.onDisconnect().remove();
-        }
-
-        function userInput(act, isDown) {
-            if(isDead) return;
-            
-            // Logic Stamina habis = Idle
-            if(isDown && myStamina <= 0) {
-                myState = 'idle';
-            } else {
-                myState = isDown ? act : 'idle';
-            }
-
-            // Kirim ke DB
-            const key = role === 'host' ? 'hState' : 'jState';
-            gameRef.child(key).set(myState);
-        }
-
-        function startLoop() {
-            ticker = setInterval(() => {
-                if(isDead) return;
-
-                // --- 1. STAMINA SYSTEM (FIXED) ---
-                // Update stamina lokal setiap tick, jangan nunggu DB
-                if(myState !== 'idle') {
-                    myStamina -= 2.5; // Boros
-                    if(myStamina < 0) {
-                        myStamina = 0;
-                        myState = 'idle'; // Force idle
-                        userInput('idle', false); // Sync force idle
-                    }
-                } else {
-                    if(myStamina < 100) myStamina += 1.5; // Regen
-                }
-                
-                // Update UI Stamina Langsung (Realtime 60fps feel)
-                document.getElementById('stamina-p1').style.width = myStamina + '%';
-                
-                // Disable button visual
-                const btns = document.querySelectorAll('.btn-ctrl');
-                if(myStamina <= 5) btns.forEach(b => b.classList.add('disabled'));
-                else if(myStamina > 20) btns.forEach(b => b.classList.remove('disabled'));
-
-
-                // --- 2. DAMAGE CALCULATION (Client Authoritative for Dealing Damage) ---
-                let dmg = 0;
-                
-                // Clash Detector
-                const isClash = (myState === 'attack' && enemyState === 'attack');
-                const txt = document.getElementById('fx-text');
-                
-                if(isClash) {
-                    txt.style.display = 'block';
-                    txt.innerText = "CLASH!";
-                    triggerShake(false); // Shake dikit
-                } else {
-                    txt.style.display = 'none';
-                    
-                    // Hit Logic
-                    if(myState === 'attack' && enemyState === 'idle') {
-                        dmg = 1.2; // Damage Value
-                    }
-                }
-
-                // Apply Damage to DB
-                if(dmg > 0) {
-                    const target = role === 'host' ? 'jHP' : 'hHP';
-                    gameRef.child(target).transaction(h => (h || 0) - dmg);
-                }
-
-                // --- 3. RENDER VISUALS ---
-                renderThumbVisuals(isClash);
-
-            }, 50); // 20 Ticks per detik (Smooth)
-        }
-
-        function renderThumbVisuals(isClash) {
-            // Update HP Bar
-            document.getElementById('hp-p1').style.width = myHP + '%';
-            document.getElementById('hp-p2').style.width = enemyHP + '%';
-
-            // Classes
-            const t1 = document.querySelector('#thumb-p1');
-            const t2 = document.querySelector('#thumb-p2');
-            const t2Body = t2.querySelector('.thumb-body');
-
-            // My Thumb
-            t1.className = 'thumb-wrapper ' + (myState === 'attack' ? 'atk' : myState === 'dodge' ? 'dodge' : '');
-            
-            // Enemy Thumb
-            t2.className = 'thumb-wrapper ' + (enemyState === 'attack' ? 'atk' : enemyState === 'dodge' ? 'dodge' : '');
-
-            // Hit Effect pada Musuh (Jika kita attack dan musuh idle)
-            if(myState === 'attack' && enemyState === 'idle') {
-                t2Body.classList.add('hit-anim');
-            } else {
-                t2Body.classList.remove('hit-anim');
-            }
-
-            // Dynamic Zoom Effect
-            const arena = document.getElementById('arena-box');
-            if(myState === 'attack' || enemyState === 'attack') {
-                arena.classList.add('zoom-in');
-            } else {
-                arena.classList.remove('zoom-in');
-            }
-        }
-
-        // --- FX HELPERS ---
-        function triggerShake(isHard) {
-            const screen = document.getElementById('screen-game');
-            if(isHard) {
-                screen.classList.add('shake-screen', 'flash-red');
-                if(navigator.vibrate) navigator.vibrate(200); // HP Getar
-            } else {
-                screen.classList.add('shake-screen');
-            }
-            
-            setTimeout(() => {
-                screen.classList.remove('shake-screen', 'flash-red');
-            }, 300);
-        }
-
-        function endGame() {
-            clearInterval(ticker);
-            gameRef.off();
-            show('screen-result');
-            
-            const title = document.getElementById('res-title');
-            if(myHP > enemyHP) {
-                title.innerText = "VICTORY! 👑";
-                title.style.color = "#00d2d3";
-            } else {
-                title.innerText = "KNOCKED OUT 💀";
-                title.style.color = "#ff6b6b";
-            }
-        }
+            }, 800); // Update teks setiap 0.8 detik
+        });
     </script>
 </body>
 </html>
